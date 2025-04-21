@@ -4,19 +4,6 @@ import { getMuseum, Museum } from '@/lib/museums';
 
 console.log('Chat API route initialized');
 
-// Define interfaces for ticket and show types
-interface Ticket {
-  name: string;
-  price: number;
-  description: string;
-}
-
-interface Show {
-  name: string;
-  description: string;
-  schedule: string;
-}
-
 // Fallback response function when Gemini API isn't available
 function generateFallbackResponse(message: string, museumData: Museum | null): string {
   const query = message.toLowerCase();
@@ -26,7 +13,7 @@ function generateFallbackResponse(message: string, museumData: Museum | null): s
     if (query.includes('ticket') || query.includes('price') || query.includes('cost')) {
       return `Here are the ticket prices for ${museumData.name}:\n${
         Object.entries(museumData.tickets)
-          .map(([_type, ticket]) => `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`)
+          .map(([__, ticket]) => `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`)
           .join('\n')
       }`;
     }
@@ -108,7 +95,6 @@ export async function POST(request: Request) {
         console.log('Attempting to use Gemini API');
         response = await generateChatResponse({
           prompt: message,
-          museumData,
           language,
           history
         });

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * This script creates an admin user in Firebase.
  * Run this script once to create your admin account.

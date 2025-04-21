@@ -33,7 +33,7 @@ const features = [
 
 export function LandingPage({ onExploreClick }: { onExploreClick: () => void }) {
   const [museums, setMuseums] = useState<Museum[]>([]);
-  const [_activeMuseumIndex, setActiveMuseumIndex] = useState(0);
+  const [, setActiveMuseumIndex] = useState(0);
 
   useEffect(() => {
     setMuseums(getAllMuseums());

@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export async function GET(_req: Request) {
+export async function GET(__ : Request) {
   const session = await getServerSession(authOptions);
   return new Response(JSON.stringify(session), { 
     status: 200,
@@ -78,6 +78,6 @@ export async function GET(_req: Request) {
   });
 }
 
-export async function POST(_req: Request) {
+export async function POST(__ : Request) {
   return await getServerSession(authOptions);
 }

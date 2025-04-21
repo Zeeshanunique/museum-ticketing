@@ -14,12 +14,10 @@ export function getGeminiClient() {
 
 export async function generateChatResponse({
   prompt,
-  museumData,
   language = 'en',
   history = []
 }: {
   prompt: string;
-  museumData?: Record<string, unknown>;
   language?: string;
   history?: Array<{ role: string; content: string }>;
 }) {
@@ -28,7 +26,7 @@ export async function generateChatResponse({
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
     // Prepare the context with museum data
-    const allMuseums = getAllMuseums();
+    const allMuseums = await getAllMuseums();
     
     let systemContext = `You are a helpful assistant for a museum ticketing system. Here's what you need to know:
 
@@ -53,7 +51,7 @@ export async function generateChatResponse({
       systemContext += `Timings: ${museum.timings.opening} - ${museum.timings.closing}
 `;
       systemContext += `Tickets: `;
-      Object.entries(museum.tickets).forEach(([_key, ticket]) => {
+      Object.entries(museum.tickets).forEach(([__, ticket]) => {
         systemContext += `${ticket.name} (₹${ticket.price}) `;
       });
       systemContext += `
@@ -202,9 +200,9 @@ interface MuseumData {
   shows?: Array<{ name: string, price: number | string }>; 
 }
 
-function getAllMuseums(): Museum[] {
-  // Import the museum data directly here to avoid the top-level import
-  const museumData = require('@/data.json');
+async function getAllMuseums(): Promise<Museum[]> {
+  // Import the museum data using dynamic import
+  const { default: museumData } = await import('@/data.json');
   
   return museumData.map((museum: MuseumData) => ({
     name: museum.name,
