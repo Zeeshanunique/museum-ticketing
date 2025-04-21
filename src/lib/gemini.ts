@@ -193,34 +193,34 @@ interface Museum {
 }
 
 // Define the expected shape of museum data from JSON
-interface RawMuseum {
-  id: string;
-  name: string;
-  description: string;
-  location: {
-    address: string;
-    city: string;
-    state: string;
-    pincode: string;
-  };
-  timings: {
-    opening: string;
-    closing: string;
-    holidays: string[];
-  };
-  tickets: Record<string, {
-    name: string;
-    price: number;
-    description: string;
-  }>;
-  facilities: string[];
-  shows?: Array<{
-    name: string;
-    description: string;
-    schedule: string;
-    price: number | string;
-  }>;
-}
+// interface RawMuseum {
+//   id: string;
+//   name: string;
+//   description: string;
+//   location: {
+//     address: string;
+//     city: string;
+//     state: string;
+//     pincode: string;
+//   };
+//   timings: {
+//     opening: string;
+//     closing: string;
+//     holidays: string[];
+//   };
+//   tickets: Record<string, {
+//     name: string;
+//     price: number;
+//     description: string;
+//   }>;
+//   facilities: string[];
+//   shows?: Array<{
+//     name: string;
+//     description: string;
+//     schedule: string;
+//     price: number | string;
+//   }>;
+// }
 
 async function getAllMuseums(): Promise<Museum[]> {
   // Import the museum data using dynamic import
