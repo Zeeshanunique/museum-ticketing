@@ -1,0 +1,375 @@
+[
+    {
+        "id": "vitm",
+        "name": "Visvesvaraya Industrial and Technological Museum",
+        "description": "A premier science museum showcasing the growth of science and technology in India",
+        "location": {
+            "address": "Kasturba Road, Bangalore",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560001"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "6:00 PM",
+            "holidays": ["National Holidays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "General Entry",
+                "price": 40,
+                "description": "Standard entry ticket"
+            },
+            "student": {
+                "name": "Student Pass",
+                "price": 20,
+                "description": "Valid student ID required"
+            },
+            "family": {
+                "name": "Family Package",
+                "price": 100,
+                "description": "Up to 4 members"
+            },
+            "senior": {
+                "name": "Senior Citizen",
+                "price": 20,
+                "description": "Age 60 and above"
+            }
+        },
+        "shows": [
+            {
+                "name": "Science Show",
+                "description": "Interactive science demonstrations",
+                "schedule": "Daily at 11:00 AM and 3:00 PM",
+                "price": 50
+            }
+        ],
+        "facilities": ["Parking", "Cafeteria", "Gift Shop", "Wheelchair Access"]
+    },
+    {
+        "id": "gmbangalore",
+        "name": "Government Museum Bangalore",
+        "description": "One of the oldest museums in India, featuring archaeological artifacts and cultural exhibits",
+        "location": {
+            "address": "Kasturba Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560001"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "5:00 PM",
+            "holidays": ["Mondays", "Public Holidays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "Indian National",
+                "price": 20,
+                "description": "For Indian citizens"
+            },
+            "foreign": {
+                "name": "Foreign National",
+                "price": 200,
+                "description": "For international visitors"
+            },
+            "student": {
+                "name": "Student Pass",
+                "price": 10,
+                "description": "Valid student ID required"
+            },
+            "senior": {
+                "name": "Senior Citizen",
+                "price": 10,
+                "description": "Age 60 and above"
+            }
+        },
+        "shows": [
+            {
+                "name": "Cultural Heritage Tour",
+                "description": "Guided tour of historical artifacts",
+                "schedule": "Weekends at 11:00 AM",
+                "price": 100
+            }
+        ],
+        "facilities": ["Guide Service", "Photography Allowed", "Wheelchair Access"]
+    },
+    {
+        "id": "ngma",
+        "name": "National Gallery of Modern Art",
+        "description": "Premier institution of visual and plastic arts showcasing modern Indian art",
+        "location": {
+            "address": "49, Palace Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560052"
+        },
+        "timings": {
+            "opening": "11:00 AM",
+            "closing": "6:00 PM",
+            "holidays": ["Mondays", "National Holidays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "Indian National",
+                "price": 20,
+                "description": "For Indian citizens"
+            },
+            "foreign": {
+                "name": "Foreign National",
+                "price": 500,
+                "description": "For international visitors"
+            },
+            "student": {
+                "name": "Student Pass",
+                "price": 10,
+                "description": "Valid student ID required"
+            }
+        },
+        "shows": [
+            {
+                "name": "Art Exhibition",
+                "description": "Special curated exhibitions",
+                "schedule": "Check website for current exhibitions",
+                "price": "Included in entry ticket"
+            }
+        ],
+        "facilities": ["Art Shop", "Cafeteria", "Library", "Wheelchair Access"]
+    },
+    {
+        "id": "hal",
+        "name": "HAL Heritage Centre and Aerospace Museum",
+        "description": "India's first aerospace museum showcasing the growth of India's aviation industry",
+        "location": {
+            "address": "HAL Old Airport Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560017"
+        },
+        "timings": {
+            "opening": "9:00 AM",
+            "closing": "5:00 PM",
+            "holidays": ["Mondays"]
+        },
+        "tickets": {
+            "adult": {
+                "name": "Adult Entry",
+                "price": 50,
+                "description": "Regular adult entry"
+            },
+            "child": {
+                "name": "Child Entry",
+                "price": 30,
+                "description": "For children aged 5-12 years"
+            },
+            "family": {
+                "name": "Family Package",
+                "price": 120,
+                "description": "2 adults and 2 children"
+            }
+        },
+        "shows": [
+            {
+                "name": "Aircraft Simulator",
+                "description": "Experience flight simulation",
+                "schedule": "Every hour from 10:00 AM to 4:00 PM",
+                "price": 100
+            }
+        ],
+        "facilities": ["Parking", "Souvenir Shop", "Photography Allowed"]
+    },
+    {
+        "id": "nimhans",
+        "name": "NIMHANS Brain Museum",
+        "description": "Unique museum dedicated to neuroscience and brain research",
+        "location": {
+            "address": "Hosur Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560029"
+        },
+        "timings": {
+            "opening": "10:30 AM",
+            "closing": "4:30 PM",
+            "holidays": ["Saturdays", "Sundays", "Public Holidays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "General Entry",
+                "price": 0,
+                "description": "Free entry for all visitors"
+            }
+        },
+        "shows": [
+            {
+                "name": "Brain Awareness Tour",
+                "description": "Guided tour of brain specimens and exhibits",
+                "schedule": "Wednesday and Friday at 11:00 AM",
+                "price": 0
+            }
+        ],
+        "facilities": ["Guide Service", "Research Library"]
+    },
+    {
+        "id": "jawaharlalnehru",
+        "name": "Jawaharlal Nehru Planetarium",
+        "description": "A premier planetarium showcasing the wonders of the universe",
+        "location": {
+            "address": "Sri T. Chowdaiah Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560001"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "5:30 PM",
+            "holidays": ["Mondays", "Second Tuesdays"]
+        },
+        "tickets": {
+            "adult": {
+                "name": "Adult Entry",
+                "price": 75,
+                "description": "Regular adult entry"
+            },
+            "child": {
+                "name": "Child Entry",
+                "price": 50,
+                "description": "For children aged 5-12 years"
+            }
+        },
+        "shows": [
+            {
+                "name": "Sky Theatre Show",
+                "description": "Interactive astronomy show",
+                "schedule": "Daily at 12:00 PM, 2:30 PM, and 4:00 PM",
+                "price": 50
+            }
+        ],
+        "facilities": ["Parking", "Cafeteria", "Gift Shop", "Wheelchair Access"]
+    },
+    {
+        "id": "hmt",
+        "name": "HMT Heritage Centre and Watch Museum",
+        "description": "A museum showcasing the history of watchmaking and HMT's legacy",
+        "location": {
+            "address": "Jalahalli",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560013"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "6:30 PM",
+            "holidays": ["Sundays"]
+        },
+        "tickets": {
+            "adult": {
+                "name": "Adult Entry",
+                "price": 30,
+                "description": "Regular adult entry"
+            },
+            "child": {
+                "name": "Child Entry",
+                "price": 20,
+                "description": "For children aged 5-12 years"
+            },
+            "family": {
+                "name": "Family Package",
+                "price": 80,
+                "description": "2 adults and 2 children"
+            }
+        },
+        "shows": [
+            {
+                "name": "Watchmaking Demonstration",
+                "description": "Live watchmaking demonstration",
+                "schedule": "Daily at 11:00 AM and 3:00 PM",
+                "price": 20
+            }
+        ],
+        "facilities": ["Parking", "Cafeteria", "Gift Shop", "Wheelchair Access"]
+    },
+    {
+        "id": "ime",
+        "name": "Indian Music Experience Museum",
+        "description": "A museum showcasing the rich musical heritage of India",
+        "location": {
+            "address": "J.P. Nagar",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560078"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "6:00 PM",
+            "holidays": ["Mondays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "General Entry",
+                "price": 150,
+                "description": "Standard entry ticket"
+            },
+            "student": {
+                "name": "Student Pass",
+                "price": 100,
+                "description": "Valid student ID required"
+            },
+            "senior": {
+                "name": "Senior Citizen",
+                "price": 100,
+                "description": "Age 60 and above"
+            }
+        },
+        "shows": [
+            {
+                "name": "Music Concert",
+                "description": "Live music performances",
+                "schedule": "Check website for upcoming concerts",
+                "price": "Included in entry ticket"
+            }
+        ],
+        "facilities": ["Parking", "Cafeteria", "Gift Shop", "Wheelchair Access"]
+    },
+    {
+        "id": "map",
+        "name": "Museum of Art & Photography (MAP)",
+        "description": "A premier institution of visual and plastic arts showcasing modern Indian art",
+        "location": {
+            "address": "Kasturba Road",
+            "city": "Bangalore",
+            "state": "Karnataka",
+            "pincode": "560001"
+        },
+        "timings": {
+            "opening": "10:00 AM",
+            "closing": "6:30 PM",
+            "holidays": ["Tuesdays"]
+        },
+        "tickets": {
+            "general": {
+                "name": "General Entry",
+                "price": 150,
+                "description": "Standard entry ticket"
+            },
+            "student": {
+                "name": "Student Pass",
+                "price": 100,
+                "description": "Valid student ID required"
+            },
+            "senior": {
+                "name": "Senior Citizen",
+                "price": 100,
+                "description": "Age 60 and above"
+            }
+        },
+        "shows": [
+            {
+                "name": "Art Exhibition",
+                "description": "Special curated exhibitions",
+                "schedule": "Check website for current exhibitions",
+                "price": "Included in entry ticket"
+            }
+        ],
+        "facilities": ["Parking", "Cafeteria", "Gift Shop", "Wheelchair Access"]
+    }
+]
