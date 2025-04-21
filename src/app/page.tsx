@@ -205,7 +205,7 @@ export default function Home() {
             <Tabs defaultValue="tickets" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="tickets">Tickets</TabsTrigger>
-                <TabsTrigger value="shows">Shows & Events</TabsTrigger>
+                <TabsTrigger value="shows">Shows &amp; Events</TabsTrigger>
                 <TabsTrigger value="info">Museum Info</TabsTrigger>
               </TabsList>
               <TabsContent value="tickets">
@@ -289,7 +289,7 @@ export default function Home() {
               <TabsContent value="shows">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Special Shows & Events</CardTitle>
+                    <CardTitle>Special Shows &amp; Events</CardTitle>
                     <CardDescription>Upcoming shows and special exhibitions</CardDescription>
                   </CardHeader>
                   <CardContent>

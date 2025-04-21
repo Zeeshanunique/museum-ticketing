@@ -1,13 +1,12 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, doc, setDoc, getDocs, getDoc, query, where } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, getDocs, getDoc } from "firebase/firestore";
 import { 
   getAuth, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut,
-  onAuthStateChanged,
   User
 } from "firebase/auth";
 
@@ -25,7 +24,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// Analytics is only used in client components
 const db = getFirestore(app);
 const auth = getAuth(app);
 
@@ -97,9 +96,9 @@ export const isAdmin = async (user: User | null) => {
 };
 
 // Utility functions for database operations
-export const addMuseumData = async (museumData: any) => {
+export const addMuseumData = async (museumData: Record<string, unknown>) => {
   try {
-    await setDoc(doc(museumsCollection, museumData.id), museumData);
+    await setDoc(doc(museumsCollection, museumData.id as string), museumData);
     return { success: true };
   } catch (error) {
     console.error("Error adding museum data:", error);
@@ -110,9 +109,9 @@ export const addMuseumData = async (museumData: any) => {
 export const getAllMuseums = async () => {
   try {
     const querySnapshot = await getDocs(museumsCollection);
-    const museums: any[] = [];
+    const museums: Record<string, unknown>[] = [];
     querySnapshot.forEach((doc) => {
-      museums.push(doc.data());
+      museums.push(doc.data() as Record<string, unknown>);
     });
     return museums;
   } catch (error) {

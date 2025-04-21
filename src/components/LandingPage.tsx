@@ -233,7 +233,7 @@ export function LandingPage({ onExploreClick }: { onExploreClick: () => void }) 
             <h4 className="font-bold mb-4 text-white">Resources</h4>
             <ul className="space-y-2">
               <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">Terms &amp; Conditions</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Accessibility</a></li>
             </ul>

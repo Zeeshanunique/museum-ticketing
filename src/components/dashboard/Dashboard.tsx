@@ -3,12 +3,37 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getAllMuseums } from '@/lib/firebase';
-import { importAllMuseumsData, importMuseumById } from '@/lib/seed-database';
+import { importAllMuseumsData } from '@/lib/seed-database';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, CheckCircle, Plus } from 'lucide-react';
+
+interface Museum {
+  id: string;
+  name: string;
+  description: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  timings: {
+    opening: string;
+    closing: string;
+    holidays: string[];
+  };
+  [key: string]: unknown;
+}
+
+interface ImportResult {
+  success: boolean;
+  message: string;
+  details?: unknown;
+  error?: unknown;
+}
 
 export default function Dashboard() {
   const searchParams = useSearchParams();
@@ -17,10 +42,10 @@ export default function Dashboard() {
   const { isAdmin } = useAuth();
   
   const [activeTab, setActiveTab] = useState<string>(tabParam === 'import' ? 'import' : 'museums');
-  const [museums, setMuseums] = useState<any[]>([]);
+  const [museums, setMuseums] = useState<Museum[]>([]);
   const [loading, setLoading] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [importResult, setImportResult] = useState<any>(null);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   
   // Fetch museums data from Firebase on component mount
   useEffect(() => {
@@ -37,7 +62,7 @@ export default function Dashboard() {
   const fetchMuseums = async () => {
     setLoading(true);
     const data = await getAllMuseums();
-    setMuseums(data);
+    setMuseums(data as Museum[]);
     setLoading(false);
   };
   
@@ -47,7 +72,7 @@ export default function Dashboard() {
     
     try {
       const result = await importAllMuseumsData();
-      setImportResult(result);
+      setImportResult(result as ImportResult);
       
       if (result.success) {
         // Refresh museums list after import

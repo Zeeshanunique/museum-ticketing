@@ -332,7 +332,7 @@
     },
     {
         "id": "map",
-        "name": "Museum of Art & Photography (MAP)",
+        "name": "Museum of Art &amp; Photography (MAP)",
         "description": "A premier institution of visual and plastic arts showcasing modern Indian art",
         "location": {
             "address": "Kasturba Road",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * This script creates an admin user in Firebase.
  * Run this script once to create your admin account.
@@ -7,9 +8,9 @@
  * 2. Run with: npx ts-node src/scripts/create-admin.ts
  */
 
-const firebase = require('firebase/app');
-const auth = require('firebase/auth');
-const firestore = require('firebase/firestore');
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, collection, doc, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBLw7zHzcz5XhNbrmXle7j3GvqAeRi0ifs",
@@ -22,10 +23,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const firebaseAuth = auth.getAuth(app);
-const db = firestore.getFirestore(app);
-const usersCollection = firestore.collection(db, "users");
+const app = initializeApp(firebaseConfig);
+const firebaseAuth = getAuth(app);
+const db = getFirestore(app);
+const usersCollection = collection(db, "users");
 
 // Admin credentials - CHANGE THESE!
 const adminEmail = "admin@example.com";
@@ -35,11 +36,11 @@ async function createAdminUser() {
   try {
     console.log(`Creating admin user with email: ${adminEmail}`);
     
-    const userCredential = await auth.createUserWithEmailAndPassword(firebaseAuth, adminEmail, adminPassword);
+    const userCredential = await createUserWithEmailAndPassword(firebaseAuth, adminEmail, adminPassword);
     console.log('User account created successfully');
     
     // Set admin role in Firestore
-    await firestore.setDoc(firestore.doc(usersCollection, userCredential.user.uid), {
+    await setDoc(doc(usersCollection, userCredential.user.uid), {
       email: adminEmail,
       role: 'admin',
       createdAt: new Date().toISOString()

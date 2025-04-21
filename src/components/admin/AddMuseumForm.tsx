@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea"; 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CheckCircle, Plus, Trash } from "lucide-react";
 
 interface FacilityInput {
@@ -21,8 +21,26 @@ interface TicketTypeInput {
   description: string;
 }
 
+interface FormData {
+  id: string;
+  name: string;
+  description: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  timings: {
+    opening: string;
+    closing: string;
+    holidays: string[];
+  };
+  [key: string]: unknown;
+}
+
 export default function AddMuseumForm() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
     description: "",
@@ -59,7 +77,7 @@ export default function AddMuseumForm() {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...(prev[parent as keyof typeof prev] as object),
+          ...(prev[parent as keyof typeof prev] as Record<string, unknown>),
           [child]: value
         }
       }));
