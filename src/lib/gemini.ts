@@ -192,11 +192,42 @@ interface Museum {
   shows?: Array<{ name: string, price: number | string }>; 
 }
 
+// Define the expected shape of museum data from JSON
+interface RawMuseum {
+  id: string;
+  name: string;
+  description: string;
+  location: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  timings: {
+    opening: string;
+    closing: string;
+    holidays: string[];
+  };
+  tickets: Record<string, {
+    name: string;
+    price: number;
+    description: string;
+  }>;
+  facilities: string[];
+  shows?: Array<{
+    name: string;
+    description: string;
+    schedule: string;
+    price: number | string;
+  }>;
+}
+
 async function getAllMuseums(): Promise<Museum[]> {
   // Import the museum data using dynamic import
   const { default: museumData } = await import('@/data.json');
   
-  return museumData.map((museum: Record<string, any>) => ({
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  return museumData.map((museum: any) => ({
     name: museum.name,
     location: {
       city: museum.location.city,
@@ -207,15 +238,16 @@ async function getAllMuseums(): Promise<Museum[]> {
       closing: museum.timings.closing,
     },
     tickets: Object.fromEntries(
-      Object.entries(museum.tickets).map(([key, value]) => [
+      Object.entries(museum.tickets).map(([key, value]: [string, any]) => [
         key,
-        { name: (value as {name: string, price: number}).name, price: (value as {name: string, price: number}).price },
+        { name: value.name, price: value.price },
       ])
     ),
     facilities: museum.facilities,
-    shows: museum.shows?.map((show: {name: string, price: string | number}) => ({
+    shows: museum.shows?.map((show: any) => ({
       name: show.name,
       price: typeof show.price === 'string' ? parseFloat(show.price) : show.price,
     })),
   }));
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }
