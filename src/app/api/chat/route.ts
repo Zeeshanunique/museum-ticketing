@@ -13,7 +13,10 @@ function generateFallbackResponse(message: string, museumData: Museum | null): s
     if (query.includes('ticket') || query.includes('price') || query.includes('cost')) {
       return `Here are the ticket prices for ${museumData.name}:\n${
         Object.entries(museumData.tickets)
-          .map(([__, ticket]) => `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`)
+          .map(entry => {
+            const ticket = entry[1];
+            return `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`;
+          })
           .join('\n')
       }`;
     }
@@ -83,8 +86,8 @@ export async function POST(request: Request) {
 
     const { message, history, museumId, language = 'en' } = body;
     
-    // Get museum data if a museum ID is provided
-    const museumData = museumId ? getMuseum(museumId) : null;
+    // Get museum data if a museum ID is provided, ensuring it's either Museum or null
+    const museumData = museumId ? (getMuseum(museumId) || null) : null;
     console.log('Museum data retrieved:', museumId, !!museumData);
     
     let response;

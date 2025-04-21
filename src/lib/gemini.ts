@@ -51,7 +51,8 @@ export async function generateChatResponse({
       systemContext += `Timings: ${museum.timings.opening} - ${museum.timings.closing}
 `;
       systemContext += `Tickets: `;
-      Object.entries(museum.tickets).forEach(([__, ticket]) => {
+      Object.entries(museum.tickets).forEach((entry) => {
+        const ticket = entry[1];
         systemContext += `${ticket.name} (₹${ticket.price}) `;
       });
       systemContext += `
@@ -191,20 +192,11 @@ interface Museum {
   shows?: Array<{ name: string, price: number | string }>; 
 }
 
-interface MuseumData {
-  name: string;
-  location: { city: string, state: string };
-  timings: { opening: string, closing: string };
-  tickets: Record<string, { name: string, price: number }>;
-  facilities: string[];
-  shows?: Array<{ name: string, price: number | string }>; 
-}
-
 async function getAllMuseums(): Promise<Museum[]> {
   // Import the museum data using dynamic import
   const { default: museumData } = await import('@/data.json');
   
-  return museumData.map((museum: MuseumData) => ({
+  return museumData.map((museum: Record<string, any>) => ({
     name: museum.name,
     location: {
       city: museum.location.city,
@@ -217,13 +209,13 @@ async function getAllMuseums(): Promise<Museum[]> {
     tickets: Object.fromEntries(
       Object.entries(museum.tickets).map(([key, value]) => [
         key,
-        { name: value.name, price: value.price },
+        { name: (value as {name: string, price: number}).name, price: (value as {name: string, price: number}).price },
       ])
     ),
     facilities: museum.facilities,
-    shows: museum.shows?.map((show) => ({
+    shows: museum.shows?.map((show: {name: string, price: string | number}) => ({
       name: show.name,
-      price: show.price,
+      price: typeof show.price === 'string' ? parseFloat(show.price) : show.price,
     })),
   }));
 }

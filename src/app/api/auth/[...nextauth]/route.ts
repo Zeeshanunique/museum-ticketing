@@ -5,6 +5,31 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 
+// Extend the types for NextAuth
+declare module "next-auth" {
+  interface User {
+    id: string;
+    role: string;
+  }
+  
+  interface Session {
+    user: {
+      id: string;
+      role: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    role: string;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -48,8 +73,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
-        token.id = user.id;
+        token.role = user.role as string;
+        token.id = user.id as string;
       }
       return token;
     },
@@ -70,7 +95,7 @@ export const authOptions: NextAuthOptions = {
   },
 };
 
-export async function GET(__ : Request) {
+export async function GET() {
   const session = await getServerSession(authOptions);
   return new Response(JSON.stringify(session), { 
     status: 200,
@@ -78,6 +103,6 @@ export async function GET(__ : Request) {
   });
 }
 
-export async function POST(__ : Request) {
+export async function POST() {
   return await getServerSession(authOptions);
 }

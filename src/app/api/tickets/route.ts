@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json(bookingConfirmation);
-  } catch (__) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to process booking' },
       { status: 500 }
