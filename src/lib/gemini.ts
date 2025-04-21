@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import museumData from '@/data.json';
 
 // Initialize the Gemini API
 export function getGeminiClient() {
@@ -20,7 +19,7 @@ export async function generateChatResponse({
   history = []
 }: {
   prompt: string;
-  museumData?: any;
+  museumData?: Record<string, unknown>;
   language?: string;
   history?: Array<{ role: string; content: string }>;
 }) {
@@ -54,7 +53,7 @@ export async function generateChatResponse({
       systemContext += `Timings: ${museum.timings.opening} - ${museum.timings.closing}
 `;
       systemContext += `Tickets: `;
-      Object.entries(museum.tickets).forEach(([type, ticket]: [string, any]) => {
+      Object.entries(museum.tickets).forEach(([_key, ticket]) => {
         systemContext += `${ticket.name} (₹${ticket.price}) `;
       });
       systemContext += `
@@ -62,7 +61,7 @@ Facilities: ${museum.facilities.join(', ')}
 `;
       if (museum.shows && museum.shows.length > 0) {
         systemContext += `Current Shows: `;
-        museum.shows.forEach((show: any) => {
+        museum.shows.forEach((show) => {
           systemContext += `${show.name} (₹${show.price}) `;
         });
       }
@@ -86,7 +85,7 @@ Your role is to provide accurate, helpful information about any of these museums
     
     // Filter out assistant messages from the beginning of history
     // Gemini requires the first message to have the 'user' role
-    let formattedHistory = [];
+    const formattedHistory = [];
     let validHistoryStart = false;
     
     // Only include history if we have real messages beyond the initial greeting
@@ -185,15 +184,29 @@ Your role is to provide accurate, helpful information about any of these museums
   }
 }
 
-function getAllMuseums(): Array<{
+interface Museum {
   name: string;
   location: { city: string, state: string };
   timings: { opening: string, closing: string };
   tickets: Record<string, { name: string, price: number }>;
   facilities: string[];
-  shows?: Array<{ name: string, price: number }>; 
-}> {
-  return museumData.map((museum: any) => ({
+  shows?: Array<{ name: string, price: number | string }>; 
+}
+
+interface MuseumData {
+  name: string;
+  location: { city: string, state: string };
+  timings: { opening: string, closing: string };
+  tickets: Record<string, { name: string, price: number }>;
+  facilities: string[];
+  shows?: Array<{ name: string, price: number | string }>; 
+}
+
+function getAllMuseums(): Museum[] {
+  // Import the museum data directly here to avoid the top-level import
+  const museumData = require('@/data.json');
+  
+  return museumData.map((museum: MuseumData) => ({
     name: museum.name,
     location: {
       city: museum.location.city,
@@ -204,13 +217,13 @@ function getAllMuseums(): Array<{
       closing: museum.timings.closing,
     },
     tickets: Object.fromEntries(
-      Object.entries(museum.tickets).map(([key, value]: [string, any]) => [
+      Object.entries(museum.tickets).map(([key, value]) => [
         key,
         { name: value.name, price: value.price },
       ])
     ),
     facilities: museum.facilities,
-    shows: museum.shows?.map((show: any) => ({
+    shows: museum.shows?.map((show) => ({
       name: show.name,
       price: show.price,
     })),

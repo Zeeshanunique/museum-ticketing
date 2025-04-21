@@ -7,13 +7,20 @@ import { AlertCircle, Check } from "lucide-react";
 
 export function ChatDebugger() {
   const [status, setStatus] = useState<'idle' | 'checking' | 'success' | 'error'>('idle');
-  const [results, setResults] = useState<Record<string, any>>({});
+  const [results, setResults] = useState<Record<string, DiagnosticResult>>({});
+  
+  interface DiagnosticResult {
+    status: 'success' | 'error';
+    message: string;
+    data?: Record<string, unknown>;
+    error?: string;
+  }
   
   const runDiagnostics = async () => {
     setStatus('checking');
     setResults({});
     
-    const diagnostics: Record<string, any> = {};
+    const diagnostics: Record<string, DiagnosticResult> = {};
     
     // Check 1: Test API
     try {
@@ -36,7 +43,7 @@ export function ChatDebugger() {
       diagnostics.test = { 
         status: 'error',
         message: 'Could not connect to Test API endpoint',
-        error: (error as Error).message
+        error: error instanceof Error ? error.message : String(error)
       };
     }
     
@@ -108,7 +115,7 @@ export function ChatDebugger() {
     
     // Set overall status
     const hasErrors = Object.values(diagnostics).some(
-      (check: any) => check.status === 'error'
+      (check) => check.status === 'error'
     );
     
     setStatus(hasErrors ? 'error' : 'success');
@@ -130,7 +137,7 @@ export function ChatDebugger() {
       
       {status !== 'idle' && (
         <div className="space-y-3 mt-4">
-          {Object.entries(results).map(([key, result]: [string, any]) => (
+          {Object.entries(results).map(([key, result]) => (
             <Alert key={key} variant={result.status === 'success' ? 'default' : 'destructive'}>
               {result.status === 'success' ? (
                 <Check className="h-4 w-4" />

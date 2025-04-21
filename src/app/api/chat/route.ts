@@ -1,13 +1,24 @@
 import { NextResponse } from 'next/server';
 import { generateChatResponse } from '@/lib/gemini';
-import { getMuseum } from '@/lib/museums';
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import museumData from '@/data.json';
+import { getMuseum, Museum } from '@/lib/museums';
 
 console.log('Chat API route initialized');
 
+// Define interfaces for ticket and show types
+interface Ticket {
+  name: string;
+  price: number;
+  description: string;
+}
+
+interface Show {
+  name: string;
+  description: string;
+  schedule: string;
+}
+
 // Fallback response function when Gemini API isn't available
-function generateFallbackResponse(message: string, museumData: any): string {
+function generateFallbackResponse(message: string, museumData: Museum | null): string {
   const query = message.toLowerCase();
   
   // Museum-specific context if available
@@ -15,7 +26,7 @@ function generateFallbackResponse(message: string, museumData: any): string {
     if (query.includes('ticket') || query.includes('price') || query.includes('cost')) {
       return `Here are the ticket prices for ${museumData.name}:\n${
         Object.entries(museumData.tickets)
-          .map(([type, ticket]: [string, any]) => `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`)
+          .map(([_type, ticket]) => `- ${ticket.name}: ₹${ticket.price} - ${ticket.description}`)
           .join('\n')
       }`;
     }
@@ -35,7 +46,7 @@ function generateFallbackResponse(message: string, museumData: any): string {
     if (query.includes('show') || query.includes('event') || query.includes('exhibition')) {
       if (museumData.shows && museumData.shows.length > 0) {
         return `Current shows at ${museumData.name}:\n${
-          museumData.shows.map((show: any) => `- ${show.name}: ${show.description} (${show.schedule})`)
+          museumData.shows.map((show) => `- ${show.name}: ${show.description} (${show.schedule})`)
             .join('\n')
         }`;
       } else {

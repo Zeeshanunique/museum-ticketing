@@ -6,7 +6,6 @@ import { ArrowDown, ArrowRight, MapPin, Clock, Ticket, Info, Search, Mail } from
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllMuseums, Museum } from "@/lib/museums";
-import Image from 'next/image';
 import { ChatPopup } from "@/components/chat/chat-popup";
 
 const features = [
@@ -34,7 +33,7 @@ const features = [
 
 export function LandingPage({ onExploreClick }: { onExploreClick: () => void }) {
   const [museums, setMuseums] = useState<Museum[]>([]);
-  const [activeMuseumIndex, setActiveMuseumIndex] = useState(0);
+  const [_activeMuseumIndex, setActiveMuseumIndex] = useState(0);
 
   useEffect(() => {
     setMuseums(getAllMuseums());
@@ -81,7 +80,7 @@ export function LandingPage({ onExploreClick }: { onExploreClick: () => void }) 
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-4">
-              Discover India's Cultural Heritage
+              Discover India&apos;s Cultural Heritage
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Explore magnificent museums and book tickets effortlessly with our intelligent ticketing system.
@@ -200,7 +199,7 @@ export function LandingPage({ onExploreClick }: { onExploreClick: () => void }) 
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Explore?</h2>
           <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Start your cultural journey today. Book tickets, discover museums, and learn about India's rich heritage.
+            Start your cultural journey today. Book tickets, discover museums, and learn about India&apos;s rich heritage.
           </p>
           <Button 
             size="lg" 

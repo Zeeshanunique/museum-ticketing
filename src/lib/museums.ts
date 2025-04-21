@@ -36,15 +36,15 @@ export interface Museum {
 }
 
 // Parse the data correctly instead of using a direct type assertion
-export const museums: Museum[] = (data as any[]).map(item => ({
-  id: item.id,
-  name: item.name,
-  description: item.description,
-  location: item.location,
-  timings: item.timings,
+export const museums: Museum[] = (data as Record<string, unknown>[]).map(item => ({
+  id: item.id as string,
+  name: item.name as string,
+  description: item.description as string,
+  location: item.location as Museum['location'],
+  timings: item.timings as Museum['timings'],
   tickets: item.tickets as {[key: string]: Ticket},
   shows: item.shows as Show[],
-  facilities: item.facilities
+  facilities: item.facilities as string[]
 }));
 
 export function getMuseum(id: string): Museum | undefined {
