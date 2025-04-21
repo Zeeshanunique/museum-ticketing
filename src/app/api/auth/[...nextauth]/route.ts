@@ -10,5 +10,9 @@ export async function GET() {
 }
 
 export async function POST() {
-  return await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
+  return new Response(JSON.stringify(session), { 
+    status: 200,
+    headers: { "Content-Type": "application/json" }
+  });
 }
