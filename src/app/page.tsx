@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ChatInterface } from "@/components/chat/chat-interface";
 import { getAllMuseums,  Museum } from "@/lib/museums";
@@ -233,50 +233,62 @@ export default function Home() {
                                   <DialogTitle>Book {ticket.name}</DialogTitle>
                                   <DialogDescription>Fill in your details to book your tickets</DialogDescription>
                                 </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                  <div className="grid gap-2">
-                                    <label>Name</label>
-                                    <Input
-                                      value={bookingData.name}
-                                      onChange={(e) => setBookingData({...bookingData, name: e.target.value})}
-                                    />
+                                <form onSubmit={(e) => {
+                                  e.preventDefault();
+                                  handleBooking(id);
+                                }}>
+                                  <div className="grid gap-4 py-4">
+                                    <div className="grid gap-2">
+                                      <label>Name</label>
+                                      <Input
+                                        value={bookingData.name}
+                                        onChange={(e) => setBookingData({...bookingData, name: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <label>Email</label>
+                                      <Input
+                                        type="email"
+                                        value={bookingData.email}
+                                        onChange={(e) => setBookingData({...bookingData, email: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <label>Phone</label>
+                                      <Input
+                                        value={bookingData.phone}
+                                        onChange={(e) => setBookingData({...bookingData, phone: e.target.value})}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <label>Visit Date</label>
+                                      <Input
+                                        type="date"
+                                        value={bookingData.date}
+                                        onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
+                                        required
+                                        min={new Date().toISOString().split('T')[0]}
+                                      />
+                                    </div>
+                                    <div className="grid gap-2">
+                                      <label>Number of Tickets</label>
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        max="10"
+                                        value={bookingData.quantity}
+                                        onChange={(e) => setBookingData({...bookingData, quantity: parseInt(e.target.value)})}
+                                        required
+                                      />
+                                    </div>
                                   </div>
-                                  <div className="grid gap-2">
-                                    <label>Email</label>
-                                    <Input
-                                      type="email"
-                                      value={bookingData.email}
-                                      onChange={(e) => setBookingData({...bookingData, email: e.target.value})}
-                                    />
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <label>Phone</label>
-                                    <Input
-                                      value={bookingData.phone}
-                                      onChange={(e) => setBookingData({...bookingData, phone: e.target.value})}
-                                    />
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <label>Date</label>
-                                    <Input
-                                      type="date"
-                                      value={bookingData.date}
-                                      onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
-                                    />
-                                  </div>
-                                  <div className="grid gap-2">
-                                    <label>Quantity</label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      value={bookingData.quantity}
-                                      onChange={(e) => setBookingData({...bookingData, quantity: parseInt(e.target.value)})}
-                                    />
-                                  </div>
-                                  <Button onClick={() => handleBooking(id)}>
-                                    Confirm Booking
-                                  </Button>
-                                </div>
+                                  <DialogFooter>
+                                    <Button type="submit">Proceed to Payment</Button>
+                                  </DialogFooter>
+                                </form>
                               </DialogContent>
                             </Dialog>
                           </div>
