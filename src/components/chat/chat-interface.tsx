@@ -197,14 +197,35 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
     }
   };
 
-  // Handle booking form submission
+  // Improve the handleBookingSubmit function to provide better user feedback
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedMuseum) return;
+    // Validate form data
+    if (!selectedMuseum) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Please select a museum first before booking tickets.'
+      }]);
+      return;
+    }
+    
+    if (!bookingData.ticketType) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Please select a ticket type to continue with your booking.'
+      }]);
+      return;
+    }
     
     setIsLoading(true);
     setShowBookingForm(false);
+    
+    // Show processing message
+    setMessages(prev => [...prev, { 
+      role: 'assistant', 
+      content: 'Processing your booking request...'
+    }]);
     
     try {
       // First, create a payment intent
@@ -239,26 +260,45 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
         totalAmount: selectedMuseum.tickets[bookingData.ticketType].price * bookingData.quantity
       };
       
-      // Add booking confirmation message
-      setMessages(prev => [
-        ...prev, 
-        { 
-          role: 'assistant', 
-          content: `Great! I've prepared your booking for ${fullBookingData.quantity} ${selectedMuseum.tickets[bookingData.ticketType].name} ticket(s) for ${selectedMuseum.name} on ${bookingData.date}. Please proceed to payment to complete your booking.`,
-          type: 'booking-confirmation',
-          bookingData: {
-            ...fullBookingData,
-            paymentId: paymentData.paymentId,
-            amount: paymentData.amount
+      // Replace the processing message with confirmation
+      setMessages(prev => {
+        // Find and remove the "Processing your booking request..." message
+        const filteredMessages = prev.filter(msg => 
+          !(msg.role === 'assistant' && msg.content === 'Processing your booking request...')
+        );
+        
+        // Add the confirmation message
+        return [
+          ...filteredMessages, 
+          { 
+            role: 'assistant', 
+            content: `Great! I've prepared your booking for ${fullBookingData.quantity} ${selectedMuseum.tickets[bookingData.ticketType].name} ticket(s) for ${selectedMuseum.name} on ${bookingData.date}. Please proceed to payment to complete your booking.`,
+            type: 'booking-confirmation',
+            bookingData: {
+              ...fullBookingData,
+              paymentId: paymentData.paymentId,
+              amount: paymentData.amount
+            }
           }
-        }
-      ]);
+        ];
+      });
     } catch (error) {
       console.error('Booking error:', error);
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: 'Sorry, I couldn\'t process your booking request. Please try again later.'
-      }]);
+      // Replace the processing message with error
+      setMessages(prev => {
+        // Find and remove the "Processing your booking request..." message
+        const filteredMessages = prev.filter(msg => 
+          !(msg.role === 'assistant' && msg.content === 'Processing your booking request...')
+        );
+        
+        return [
+          ...filteredMessages, 
+          { 
+            role: 'assistant', 
+            content: 'Sorry, I couldn\'t process your booking request. Please try again later.'
+          }
+        ];
+      });
     } finally {
       setIsLoading(false);
     }
@@ -314,6 +354,37 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
     return typingTexts[language] || typingTexts['en'];
   };
 
+  // Add a dedicated function for handling the booking button click
+  const handleBookingButtonClick = () => {
+    // Reset booking form data
+    setBookingData({
+      name: '',
+      email: '',
+      phone: '',
+      date: '',
+      quantity: 1,
+      ticketType: ''
+    });
+    
+    // Add booking message and show form
+    setMessages(prev => [
+      ...prev, 
+      { 
+        role: 'assistant', 
+        content: `I can help you book tickets for ${selectedMuseum?.name}. Please fill out the following form:`,
+        type: 'booking-form'
+      }
+    ]);
+    setShowBookingForm(true);
+    
+    // Scroll to the bottom to show the form
+    setTimeout(() => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
+
   return (
     <Card className={`h-full flex flex-col ${className}`}>
       <CardHeader className="pb-4">
@@ -329,17 +400,7 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
           <div className="flex items-center gap-2">
             {selectedMuseum && (
               <Button 
-                onClick={() => {
-                  setMessages(prev => [
-                    ...prev, 
-                    { 
-                      role: 'assistant', 
-                      content: `I can help you book tickets for ${selectedMuseum.name}. Please fill out the following form:`,
-                      type: 'booking-form'
-                    }
-                  ]);
-                  setShowBookingForm(true);
-                }}
+                onClick={handleBookingButtonClick}
                 variant="default"
                 className="mr-2"
               >
@@ -380,7 +441,7 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
                 
                 {/* Show booking form if this is a booking form message */}
-                {message.role === 'assistant' && message.type === 'booking-form' && index === messages.length - 1 && showBookingForm && (
+                {message.role === 'assistant' && message.type === 'booking-form' && showBookingForm && (
                   <form onSubmit={handleBookingSubmit} className="mt-4 bg-white p-4 rounded-md border border-gray-200">
                     <div className="space-y-3">
                       <div>
