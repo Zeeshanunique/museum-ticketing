@@ -326,18 +326,39 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
                 : 'Ask me anything about museums, tickets, events, or exhibitions'}
             </CardDescription>
           </div>
-          <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger className="w-[100px]">
-              <SelectValue placeholder="Language" />
-            </SelectTrigger>
-            <SelectContent>
-              {LANGUAGES.map((lang) => (
-                <SelectItem key={lang.code} value={lang.code}>
-                  {lang.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            {selectedMuseum && (
+              <Button 
+                onClick={() => {
+                  setMessages(prev => [
+                    ...prev, 
+                    { 
+                      role: 'assistant', 
+                      content: `I can help you book tickets for ${selectedMuseum.name}. Please fill out the following form:`,
+                      type: 'booking-form'
+                    }
+                  ]);
+                  setShowBookingForm(true);
+                }}
+                variant="default"
+                className="mr-2"
+              >
+                Book Tickets
+              </Button>
+            )}
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-[100px]">
+                <SelectValue placeholder="Language" />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex-grow flex flex-col pt-0 overflow-hidden">
