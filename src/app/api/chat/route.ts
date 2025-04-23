@@ -8,6 +8,16 @@ console.log('Chat API route initialized');
 function generateFallbackResponse(message: string, museumData: Museum | null): string {
   const query = message.toLowerCase();
   
+  // Detect booking intents
+  if (museumData && (
+    query.includes('book ticket') || 
+    query.includes('buy ticket') || 
+    query.includes('purchase ticket') ||
+    query.includes('get ticket')
+  )) {
+    return `I can help you book tickets for ${museumData.name}. You can tell me "I want to book tickets" to get started.`;
+  }
+  
   // Museum-specific context if available
   if (museumData) {
     if (query.includes('ticket') || query.includes('price') || query.includes('cost')) {
@@ -44,6 +54,11 @@ function generateFallbackResponse(message: string, museumData: Museum | null): s
       }
     }
     
+    // Generic booking inquiry
+    if (query.includes('book') || query.includes('reservation') || query.includes('tickets')) {
+      return `You can book tickets for ${museumData.name} directly through our chat interface. Just type "I want to book tickets" and I'll help you through the process.`;
+    }
+    
     return `I can help you with information about ${museumData.name}, including tickets, timings, and special shows. What would you like to know?`;
   }
   
@@ -54,6 +69,10 @@ function generateFallbackResponse(message: string, museumData: Museum | null): s
   
   if (query.includes('museum') && query.includes('list')) {
     return 'We have several museums including Visvesvaraya Industrial and Technological Museum, National Gallery of Modern Art, Government Museum Bangalore, and more. Please select one to learn more.';
+  }
+  
+  if (query.includes('book') || query.includes('purchase') || query.includes('buy') || query.includes('reservation')) {
+    return 'To book tickets, please select a museum first, and then let me know you want to book tickets.';
   }
   
   return 'I can help you with information about museums, tickets, and shows. Please select a museum or ask a more specific question.';
@@ -90,7 +109,26 @@ export async function POST(request: Request) {
     const museumData = museumId ? (getMuseum(museumId) || null) : null;
     console.log('Museum data retrieved:', museumId, !!museumData);
     
-    let response;
+    let response: string = '';
+    
+    // Check if this is a booking-related query that should be handled by the frontend
+    const bookingKeywords = ['book ticket', 'buy ticket', 'purchase ticket', 'get ticket', 'reserve ticket'];
+    const isBookingRequest = bookingKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    
+    if (isBookingRequest && museumData) {
+      // For booking requests, return a special message that will be detected by the frontend
+      response = `I can help you book tickets for ${museumData.name}. `;
+      
+      // Add ticket information
+      response += `Here are the available ticket types:\n`;
+      Object.entries(museumData.tickets).forEach(([id, ticket]) => {
+        response += `- ${ticket.name}: ₹${ticket.price} (${ticket.description})\n`;
+      });
+      
+      response += `\nWould you like to proceed with booking a ticket?`;
+      
+      return NextResponse.json({ response });
+    }
     
     // Try to use Gemini if API key is available
     if (process.env.GEMINI_API_KEY) {

@@ -11,6 +11,8 @@ import { Loader2 } from 'lucide-react';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  type?: 'text' | 'booking-form' | 'booking-confirmation';
+  bookingData?: any;
 }
 
 interface ChatInterfaceProps {
@@ -41,6 +43,17 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
   const [language, setLanguage] = useState('en');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Add new states for booking
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [bookingData, setBookingData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    date: '',
+    quantity: 1,
+    ticketType: ''
+  });
 
   // Scroll to the bottom of the chat on new messages
   useEffect(() => {
@@ -98,6 +111,29 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
     setIsLoading(true);
 
     try {
+      // Check if the message is about booking tickets
+      if (selectedMuseum && (
+        userMessage.toLowerCase().includes('book ticket') || 
+        userMessage.toLowerCase().includes('buy ticket') ||
+        userMessage.toLowerCase().includes('purchase ticket') ||
+        userMessage.toLowerCase().includes('get ticket')
+      )) {
+        // Display booking form message
+        setTimeout(() => {
+          setMessages(prev => [
+            ...prev, 
+            { 
+              role: 'assistant', 
+              content: `I can help you book tickets for ${selectedMuseum.name}. Please fill out the following form:`,
+              type: 'booking-form'
+            }
+          ]);
+          setShowBookingForm(true);
+          setIsLoading(false);
+        }, 1000);
+        return;
+      }
+
       // Prepare chat history for the API
       const chatHistory = messages.map(msg => ({
         role: msg.role,
@@ -159,6 +195,79 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle booking form submission
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedMuseum) return;
+    
+    setIsLoading(true);
+    setShowBookingForm(false);
+    
+    try {
+      // First, create a payment intent
+      const paymentResponse = await fetch('/api/payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          museumId: selectedMuseum.id,
+          ticketType: bookingData.ticketType,
+          quantity: bookingData.quantity
+        }),
+      });
+      
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to create payment');
+      }
+      
+      const paymentData = await paymentResponse.json();
+      
+      // Prepare booking data to pass to payment page
+      const fullBookingData = {
+        museumId: selectedMuseum.id,
+        ticketType: bookingData.ticketType,
+        quantity: bookingData.quantity,
+        date: bookingData.date,
+        visitorDetails: {
+          name: bookingData.name,
+          email: bookingData.email,
+          phone: bookingData.phone
+        },
+        bookingId: `BK${Date.now()}`,
+        totalAmount: selectedMuseum.tickets[bookingData.ticketType].price * bookingData.quantity
+      };
+      
+      // Add booking confirmation message
+      setMessages(prev => [
+        ...prev, 
+        { 
+          role: 'assistant', 
+          content: `Great! I've prepared your booking for ${fullBookingData.quantity} ${selectedMuseum.tickets[bookingData.ticketType].name} ticket(s) for ${selectedMuseum.name} on ${bookingData.date}. Please proceed to payment to complete your booking.`,
+          type: 'booking-confirmation',
+          bookingData: {
+            ...fullBookingData,
+            paymentId: paymentData.paymentId,
+            amount: paymentData.amount
+          }
+        }
+      ]);
+    } catch (error) {
+      console.error('Booking error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Sorry, I couldn\'t process your booking request. Please try again later.'
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Add handlePayment function
+  const handlePayment = (bookingData: any) => {
+    // Redirect to payment page with booking data
+    window.location.href = `/payment?paymentId=${bookingData.paymentId}&amount=${bookingData.amount}&bookingData=${encodeURIComponent(JSON.stringify(bookingData))}`;
   };
 
   // Handle Enter key press
@@ -248,33 +357,109 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
                 }`}
               >
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
+                
+                {/* Show booking form if this is a booking form message */}
+                {message.role === 'assistant' && message.type === 'booking-form' && index === messages.length - 1 && showBookingForm && (
+                  <form onSubmit={handleBookingSubmit} className="mt-4 bg-white p-4 rounded-md border border-gray-200">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Name</label>
+                        <Input 
+                          value={bookingData.name}
+                          onChange={(e) => setBookingData({...bookingData, name: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Email</label>
+                        <Input 
+                          type="email"
+                          value={bookingData.email}
+                          onChange={(e) => setBookingData({...bookingData, email: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Phone</label>
+                        <Input 
+                          value={bookingData.phone}
+                          onChange={(e) => setBookingData({...bookingData, phone: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Visit Date</label>
+                        <Input 
+                          type="date"
+                          value={bookingData.date}
+                          onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
+                          required
+                          min={new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Ticket Type</label>
+                        <select 
+                          className="w-full rounded-md border border-gray-300 p-2"
+                          value={bookingData.ticketType}
+                          onChange={(e) => setBookingData({...bookingData, ticketType: e.target.value})}
+                          required
+                        >
+                          <option value="">Select a ticket type</option>
+                          {selectedMuseum && Object.entries(selectedMuseum.tickets).map(([id, ticket]) => (
+                            <option key={id} value={id}>
+                              {ticket.name} - ₹{ticket.price}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Quantity</label>
+                        <Input 
+                          type="number"
+                          min="1"
+                          max="10"
+                          value={bookingData.quantity}
+                          onChange={(e) => setBookingData({...bookingData, quantity: parseInt(e.target.value)})}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full">Submit Booking</Button>
+                    </div>
+                  </form>
+                )}
+                
+                {/* Show booking confirmation and payment button */}
+                {message.role === 'assistant' && message.type === 'booking-confirmation' && (
+                  <div className="mt-4">
+                    <Button 
+                      onClick={() => handlePayment(message.bookingData)}
+                      className="w-full"
+                    >
+                      Proceed to Payment
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && (
-              <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                <p className="text-sm text-gray-500 flex items-center">
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {getTypingText()}
-                </p>
+              <div className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex items-center space-x-2">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                <p className="text-sm text-gray-500">{getTypingText()}</p>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
           <Input
-            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder={getPlaceholder()}
-            className="flex-grow"
             disabled={isLoading}
           />
-          <Button 
-            onClick={handleSend} 
-            disabled={isLoading || !input.trim()}
-          >
+          <Button onClick={handleSend} disabled={!input.trim() || isLoading}>
             {getSendButtonText()}
           </Button>
         </div>
