@@ -304,10 +304,15 @@ export function ChatInterface({ selectedMuseum, className, height = "600px" }: C
     }
   };
 
-  // Add handlePayment function
+  // Update the handlePayment function to ensure it uses router for navigation
   const handlePayment = (bookingData: any) => {
-    // Redirect to payment page with booking data
-    window.location.href = `/payment?paymentId=${bookingData.paymentId}&amount=${bookingData.amount}&bookingData=${encodeURIComponent(JSON.stringify(bookingData))}`;
+    console.log("Redirecting to payment page with data:", bookingData);
+    
+    // Construct the payment URL with booking data
+    const paymentUrl = `/payment?paymentId=${bookingData.paymentId}&amount=${bookingData.amount}&bookingData=${encodeURIComponent(JSON.stringify(bookingData))}`;
+    
+    // Use window.location for a full page redirect to ensure the payment page loads
+    window.location.href = paymentUrl;
   };
 
   // Handle Enter key press

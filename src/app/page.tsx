@@ -48,49 +48,49 @@ export default function Home() {
     if (!selectedMuseum) return;
 
     try {
-      const response = await fetch('/api/tickets', {
+      // First create a payment intent
+      const paymentResponse = await fetch('/api/payment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           museumId: selectedMuseum.id,
-          type: ticketType,
-          ...bookingData,
-          visitorDetails: {
-            name: bookingData.name,
-            email: bookingData.email,
-            phone: bookingData.phone
-          }
+          ticketType: ticketType,
+          quantity: bookingData.quantity
         }),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        // Close the booking dialog
-        setBookingDialog(false);
-        
-        // Set ticket data for the receipt
-        const selectedTicket = selectedMuseum.tickets[ticketType];
-        const ticketInfo: TicketData = {
-          bookingId: data.bookingId,
-          museumName: selectedMuseum.name,
-          ticketType: selectedTicket.name,
-          visitorName: bookingData.name,
-          date: bookingData.date,
-          quantity: bookingData.quantity,
-          price: selectedTicket.price,
-          totalAmount: selectedTicket.price * bookingData.quantity,
-          bookingDate: new Date().toLocaleDateString()
-        };
-        
-        setTicketData(ticketInfo);
-        setShowTicketModal(true);
-      } else {
-        alert('Booking failed: ' + data.error);
+      if (!paymentResponse.ok) {
+        throw new Error('Failed to create payment intent');
       }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+      const paymentData = await paymentResponse.json();
+      
+      // Close the booking dialog
+      setBookingDialog(false);
+      
+      // Prepare booking data
+      const fullBookingData = {
+        museumId: selectedMuseum.id,
+        ticketType: ticketType,
+        quantity: bookingData.quantity,
+        date: bookingData.date,
+        visitorDetails: {
+          name: bookingData.name,
+          email: bookingData.email,
+          phone: bookingData.phone
+        },
+        bookingId: `BK${Date.now()}`,
+        totalAmount: selectedMuseum.tickets[ticketType].price * bookingData.quantity,
+        paymentId: paymentData.paymentId,
+        amount: paymentData.amount
+      };
+      
+      // Redirect to payment page
+      window.location.href = `/payment?paymentId=${paymentData.paymentId}&amount=${paymentData.amount}&bookingData=${encodeURIComponent(JSON.stringify(fullBookingData))}`;
     } catch (error) {
+      console.error('Booking error:', error);
       alert('Failed to process booking. Please try again.');
     }
   };
