@@ -23,10 +23,13 @@ export async function generateChatResponse({
 }) {
   try {
     const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+    
+    console.log('Gemini client initialized successfully');
     
     // Prepare the context with museum data
     const allMuseums = await getAllMuseums();
+    console.log('Retrieved museum data for context:', allMuseums.length, 'museums');
     
     let systemContext = `You are a helpful assistant for a museum ticketing system. Here's what you need to know:
 
@@ -109,6 +112,7 @@ Your role is to provide accurate, helpful information about any of these museums
     
     // If no valid history or current message is the first one
     if (formattedHistory.length === 0) {
+      console.log('Using direct generation (no history)');
       // Directly send the prompt without history
       const result = await model.generateContent({
         contents: [{ 
@@ -141,10 +145,20 @@ Your role is to provide accurate, helpful information about any of these museums
         ],
       });
       
-      return result.response.text();
+      const responseText = result.response.text();
+      console.log('Gemini response text:', responseText);
+      
+      // Check if response is empty and provide fallback
+      if (!responseText || responseText.trim() === '') {
+        console.warn('Gemini returned empty response, using fallback');
+        throw new Error('Empty response from Gemini API');
+      }
+      
+      return responseText;
     } 
     // Create chat session with valid history
     else {
+      console.log('Using chat session with history, messages:', formattedHistory.length);
       const chat = model.startChat({
         history: formattedHistory,
         generationConfig: {
@@ -175,7 +189,16 @@ Your role is to provide accurate, helpful information about any of these museums
       
       // Send the prompt with system context
       const result = await chat.sendMessage(`${systemContext}\n\nUser question: ${prompt}`);
-      return result.response.text();
+      const responseText = result.response.text();
+      console.log('Gemini chat response text:', responseText);
+      
+      // Check if response is empty and provide fallback
+      if (!responseText || responseText.trim() === '') {
+        console.warn('Gemini chat returned empty response, using fallback');
+        throw new Error('Empty response from Gemini API');
+      }
+      
+      return responseText;
     }
   } catch (error) {
     console.error('Error generating response with Gemini:', error);

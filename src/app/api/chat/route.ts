@@ -75,6 +75,11 @@ function generateFallbackResponse(message: string, museumData: Museum | null): s
     return 'To book tickets, please select a museum first, and then let me know you want to book tickets.';
   }
   
+  // Handle basic greetings
+  if (query.includes('hi') || query.includes('hello') || query.includes('hey') || query === 'hi' || query === 'hello') {
+    return 'Hello! I\'m here to help you with museum information and ticket bookings. You can ask me about museum timings, ticket prices, current exhibitions, or let me know if you want to book tickets. What would you like to know?';
+  }
+  
   return 'I can help you with information about museums, tickets, and shows. Please select a museum or ask a more specific question.';
 }
 
@@ -84,7 +89,9 @@ export async function GET() {
     status: 'ok', 
     message: 'Chat API is working correctly',
     config: {
-      hasGeminiKey: !!process.env.GEMINI_API_KEY
+      hasGeminiKey: !!process.env.GEMINI_API_KEY,
+      geminiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
+      geminiKeyPrefix: process.env.GEMINI_API_KEY?.substring(0, 8) || 'not-found'
     }
   });
 }
@@ -139,7 +146,13 @@ export async function POST(request: Request) {
           language,
           history
         });
-        console.log('Gemini API response received successfully');
+        console.log('Gemini API response received, length:', response?.length || 0);
+        
+        // Check if response is empty or just whitespace
+        if (!response || response.trim() === '') {
+          console.warn('Gemini returned empty response, falling back to basic responses');
+          response = generateFallbackResponse(message, museumData);
+        }
       } catch (geminiError) {
         console.error('Gemini API error:', geminiError);
         // Fall back to basic responses if Gemini fails
