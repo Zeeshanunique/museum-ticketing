@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,6 +33,8 @@ interface TicketData {
 }
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [showLandingPage, setShowLandingPage] = useState(true);
   const [selectedMuseum, setSelectedMuseum] = useState<Museum | null>(getAllMuseums()[0]);
   const [bookingData, setBookingData] = useState<BookingFormData>({
@@ -43,6 +47,65 @@ export default function Home() {
   const [ticketData, setTicketData] = useState<TicketData | null>(null);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [bookingDialog, setBookingDialog] = useState(false);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+
+  // Handle authentication flow - use a separate effect for navigation
+  useEffect(() => {
+    if (!loading && !user && !showLandingPage) {
+      setShouldRedirect(true);
+    }
+  }, [user, loading, showLandingPage]);
+
+  // Separate effect for navigation to avoid setState during render
+  useEffect(() => {
+    if (shouldRedirect) {
+      setShouldRedirect(false);
+      router.push('/login');
+    }
+  }, [shouldRedirect, router]);
+
+  // Show landing page to everyone initially
+  if (showLandingPage) {
+    const handleExploreClick = () => {
+      if (user) {
+        // User is authenticated, show the main app
+        setShowLandingPage(false);
+      } else {
+        // User is not authenticated, redirect to login
+        setTimeout(() => {
+          router.push('/login');
+        }, 0);
+      }
+    };
+
+    return (
+      <LandingPage onExploreClick={handleExploreClick} />
+    );
+  }
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated and not on landing page, show loading while redirecting
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to login...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleBooking = async (ticketType: string) => {
     if (!selectedMuseum) return;
@@ -147,10 +210,6 @@ export default function Home() {
       }
     }
   };
-
-  if (showLandingPage) {
-    return <LandingPage onExploreClick={() => setShowLandingPage(false)} />;
-  }
 
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
